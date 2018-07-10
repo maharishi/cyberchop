@@ -1,4 +1,5 @@
-drop table machine_list;
+begin transaction;
+drop table if exists machine_list;
 create table machine_list
 (
 	ip_address varchar(20),

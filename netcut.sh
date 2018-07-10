@@ -542,14 +542,18 @@ function default_gw(){
 	do
 		#'none default via 30.147.0.1 dev wifi0 proto unspec metric 0'
 		if [[ $line = *"default"* ]]; then
-			local a=(`echo $line | sed 's/ /\n/g'`)
+			# local a=(`echo $line | sed 's/ /\n/g'`)
+            local a=${line// /\n/g}
 			gw=${a[3]}
 			iface=${a[5]}
+            mymac=$(cat /sys/class/net/"${iface-}"/address)
+            myip=$(hostname -I)
 		fi
 	done < <(ip route list)
 	verbose_print "Gateway IP : $gw" ${fg_yellow-}
 	verbose_print "Interface : $iface" ${fg_yellow-}
-	verbose_print "Self IP : $(hostname -I)" ${fg_yellow-}
+	verbose_print "Self IP : ${myip}" ${fg_yellow-}
+    verbose_print "Self MAC : ${mymac-}" ${fg_yellow-}
 }
 
 function arpscan(){
