@@ -485,11 +485,15 @@ function parse_params() {
 
 
 function enable_protection(){
-	run_as_root arptables -F
+	local machine_data
+    machine_data=$(select_machine true "${gw-}" )
+    local a
+    read -a a <<< "$machine_data"
+    run_as_root arptables -F
 	run_as_root arptables -P INPUT DROP
     run_as_root arptables -P OUTPUT DROP
-    run_as_root arptables -A INPUT -s "${gw-}" --source-mac "${mymac-}" -j ACCEPT
-    run_as_root arptables -A OUTPUT -d "${gw-}" --destination-mac "${mymac-}" -j ACCEPT
+    run_as_root arptables -A INPUT -s "${gw-}" --source-mac "${a[2]}" -j ACCEPT
+    run_as_root arptables -A OUTPUT -d "${gw-}" --destination-mac "${a[2]}" -j ACCEPT
 }
 
 function disable_protection(){
@@ -547,14 +551,12 @@ function default_gw(){
             read -a a <<< "$line"
 			gw=${a[3]}
 			iface=${a[5]}
-            mymac=$(cat /sys/class/net/"${iface-}"/address)
             myip=$(hostname -I)
 		fi
 	done < <(ip route list)
 	verbose_print "Gateway IP : $gw" ${fg_yellow-}
 	verbose_print "Interface : $iface" ${fg_yellow-}
 	verbose_print "Self IP : ${myip}" ${fg_yellow-}
-    verbose_print "Self MAC : ${mymac-}" ${fg_yellow-}
 }
 
 function arpscan(){
