@@ -542,8 +542,7 @@ function default_gw(){
 	do
 		#'none default via 30.147.0.1 dev wifi0 proto unspec metric 0'
 		if [[ $line = *"default"* ]]; then
-			# local a=(`echo $line | sed 's/ /\n/g'`)
-            local a=${line// /\n/g}
+			local a=(`echo $line | sed 's/ /\n/g'`)
 			gw=${a[3]}
 			iface=${a[5]}
             mymac=$(cat /sys/class/net/"${iface-}"/address)
@@ -622,21 +621,22 @@ function main() {
     lock_init system
 	#change_mac
 	default_gw
-	if $flush; then
-		netresumeall
-		refresh
-		arpscan
-	elif $scanonly; then 
-		arpscan
-	elif $cut_off; then 
-		enable_protection
-		netcutvictim ${gw-} ${victim-}
-	elif $resume_single; then 
-		netresume_single_host ${victim-}
-	elif $resume_all; then
-		netresumeall
-		disable_protection
-	fi
+	# if $flush; then
+	# 	netresumeall
+	# 	refresh
+	# 	arpscan
+	# elif $scanonly; then 
+	# 	arpscan
+	# elif $cut_off; then 
+	# 	enable_protection
+	# 	netcutvictim ${gw-} ${victim-}
+	# elif $resume_single; then 
+	# 	netresume_single_host ${victim-}
+	# elif $resume_all; then
+	# 	netresumeall
+	# 	disable_protection
+	# fi
+    echo ${mymac-}
 	select_machine false
 }
 
