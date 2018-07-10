@@ -485,17 +485,17 @@ function parse_params() {
 
 
 function enable_protection(){
-	arptables -F
-	arptables -P INPUT DROP
-    arptables -P OUTPUT DROP
-    arptables -A INPUT -s "${gw-}" --source-mac "${mymac-}" -j ACCEPT
-    arptables -A OUTPUT -d "${gw-}" --destination-mac "${mymac-}" -j ACCEPT
+	run_as_root arptables -F
+	run_as_root arptables -P INPUT DROP
+    run_as_root arptables -P OUTPUT DROP
+    run_as_root arptables -A INPUT -s "${gw-}" --source-mac "${mymac-}" -j ACCEPT
+    run_as_root arptables -A OUTPUT -d "${gw-}" --destination-mac "${mymac-}" -j ACCEPT
 }
 
 function disable_protection(){
-	arptables -P INPUT ACCEPT
-    arptables -P OUTPUT ACCEPT
-    arptables -F
+	run_as_root arptables -P INPUT ACCEPT
+    run_as_root arptables -P OUTPUT ACCEPT
+    run_as_root arptables -F
 }
 
 function netcutvictim() {
