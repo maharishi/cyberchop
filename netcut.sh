@@ -547,16 +547,14 @@ function default_gw(){
 	do
 		#'none default via 30.147.0.1 dev wifi0 proto unspec metric 0'
 		if [[ $line = *"default"* ]]; then
-			local a
-            read -a a <<< "$line"
-			gw=${a[3]}
-			iface=${a[5]}
+			gw=$(echo "$line" | grep -E -o '([0-9]{1,3}\.){3}[0-9]{1,3}')
+			iface=$(echo "$line" | grep -E -o '(eth|wifi)[0-9]')
             myip=$(hostname -I)
 		fi
 	done < <(ip route list)
-	verbose_print "Gateway IP : $gw" ${fg_yellow-}
-	verbose_print "Interface : $iface" ${fg_yellow-}
-	verbose_print "Self IP : ${myip}" ${fg_yellow-}
+	pretty_print "Gateway IP : $gw" ${fg_yellow-}
+	pretty_print "Interface : $iface" ${fg_yellow-}
+	pretty_print "Self IP : ${myip}" ${fg_yellow-}
 }
 
 function arpscan(){
@@ -568,8 +566,8 @@ function arpscan(){
 			insert_into_machine_list "${a[0]}" "${a[1]}"
 			verbose_print "inserting machine ${a[0]} with mac ${a[1]}"
 		fi
-	# done < testscan.txt
-	done < <(run_as_root arp-scan -l)
+	done < testscan.txt
+	# done < <(run_as_root arp-scan -l)
 }
 
 function insert_into_machine_list(){
@@ -603,7 +601,7 @@ function select_machine(){
 	if [ -n "$ip" ]; then
 		where=" where ip_address = '$ip' or rowid =  '$ip';"
 	fi
-	local qry="select rowid, ltrim(ip_address||'          ',20) as ip_address, gw_address, iface, arpspoof_pid, tcpkill_pid, active from machine_list"$where
+	local qry="select rowid, ltrim(ip_address||'          ',20) as ip_address, arpspoof_pid, tcpkill_pid, active from machine_list"$where
 	verbose_print "$qry" $fg_green
 	if $noheader; then
 		sqlite3 "${dbname-}" "$qry"
