@@ -486,9 +486,9 @@ function parse_params() {
 
 function enable_protection(){
 	local machine_data
-    machine_data=$(select_machine true "${gw-}" )
+    machine_data=$(get_gw_mac "${gw-}" )
     local a
-    a=(${machine_data//|/ })
+    a=(`echo "$machine_data" | sed 's/|/\n/g'`)
     run_as_root arptables -F
 	run_as_root arptables -P INPUT DROP
     run_as_root arptables -P OUTPUT DROP
@@ -566,31 +566,31 @@ function arpscan(){
 			insert_into_machine_list "${a[0]}" "${a[1]}"
 			verbose_print "inserting machine ${a[0]} with mac ${a[1]}"
 		fi
-	# done < testscan.txt
+	#done < testscan.txt
 	done < <(run_as_root arp-scan -l)
 }
 
 function insert_into_machine_list(){
 	local qry="insert into machine_list(ip_address, mac_address, gw_address, iface, active) select '$1','$2','${gw-}','${iface-}',0 where not exists(select 1 from machine_list where ip_address = '${a[0]}');" 
-	verbose_print "$qry" $fg_green
+	verbose_print "$qry" $fg_green 1>&2
 	sqlite3 "${dbname-}" "$qry"
 }
 
 function update_pid_machine_list(){
 	local qry="update machine_list set arpspoof_pid=$1, tcpkill_pid=$2, active=$4 where ip_address='$3' or rowid='$3';"
-	verbose_print "$qry" $fg_green
+	verbose_print "$qry" $fg_green 1>&2
 	sqlite3 "${dbname-}" "$qry"
 }
 
 function update_all_machine_list(){
 	local qry="update machine_list set arpspoof_pid=null, tcpkill_pid=null, active=$1"
-	verbose_print "$qry" $fg_green
+	verbose_print "$qry" $fg_green 1>&2
 	sqlite3 "${dbname-}" "$qry"
 }
 
 function refresh(){
 	qry="delete from machine_list;"
-	verbose_print "$qry" $fg_green
+	verbose_print "$qry" $fg_green 1>&2
 	sqlite3 "${dbname-}" "$qry"
 }
 
@@ -602,12 +602,23 @@ function select_machine(){
 		where=" where ip_address = '$ip' or rowid =  '$ip';"
 	fi
 	local qry="select rowid, ltrim(ip_address||'          ',20) as ip_address, arpspoof_pid, tcpkill_pid, active from machine_list"$where
-	verbose_print "$qry" $fg_green
+	verbose_print "$qry" $fg_green 1>&2
 	if $noheader; then
 		sqlite3 "${dbname-}" "$qry"
 	else
 		sqlite3 -column -header "${dbname-}" "$qry"
 	fi
+}
+
+function get_gw_mac(){
+	local ip=${1:-}
+	local where=";"
+	if [ -n "$ip" ]; then
+		where=" where ip_address = '$ip' or rowid =  '$ip';"
+	fi
+	local qry="select rowid, ip_address, mac_address from machine_list"$where
+	verbose_print "$qry" $fg_green 1>&2
+	sqlite3 "${dbname-}" "$qry"
 }
 
 # DESC: Main control flow
