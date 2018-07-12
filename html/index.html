@@ -1,1 +1,122 @@
-<b>Hello world</b>
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Net Cut</title>
+    <link rel="stylesheet" href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
+    <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+    <script src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+    <style>
+        @media all and (max-width: 35em) {
+            .my-breakpoint .ui-block-a,
+            .my-breakpoint .ui-block-b,
+            .my-breakpoint .ui-block-c,
+            .my-breakpoint .ui-block-d,
+            .my-breakpoint .ui-block-e {
+                width: 100%;
+                float: none;
+            }
+        }
+
+        @media all and (min-width: 45em) {
+            .my-breakpoint.ui-grid-b .ui-block-a {
+                width: 49.95%;
+            }
+            .my-breakpoint.ui-grid-b .ui-block-b,
+            .my-breakpoint.ui-grid-b .ui-block-c {
+                width: 24.925%;
+            }
+        }
+    </style>
+    <script>
+        (function ($) {
+            var enabledlist, disabledlist;
+            enabledlist = disabledlist = "";
+            var data = {
+                "disableditems": [{
+                        name: "Item A",
+                        rowid: "1"
+                    },
+                    {
+                        name: "Item B",
+                        rowid: "2"
+                    },
+                    {
+                        name: "Item C",
+                        rowid: "3"
+                    },
+                    {
+                        name: "Item C",
+                        rowid: "3"
+                    },
+                    {
+                        name: "Item C",
+                        rowid: "3"
+                    },
+                    {
+                        name: "Item C",
+                        rowid: "3"
+                    },
+                ],
+                "enableditems": [{
+                    name: "Item D",
+                    rowid: "4"
+                }, ]
+            }
+
+            var _updateList = function (data) {
+                $.each(data.enableditems, function (i, item) {
+                    enabledlist += '<li><a class="action" href="#" status="enabled" rowid="' + item.rowid + '">' + item.name +
+                        '</a></li>';
+                });
+                $.each(data.disableditems, function (i, item) {
+                    disabledlist += '<li><a class="action" href="#" status="disabled" rowid="' + item.rowid + '">' + item.name +
+                        '</a></li>';
+                });
+
+                $_enabledlistview.empty().append(enabledlist).listview("refresh");
+                $_disabledlistview.empty().append(disabledlist).listview("refresh");
+            };
+
+            $(document).bind("pageshow", function () {
+                $_enabledlistview = $("#enabled");
+                $_disabledlistview = $("#disabled");
+                _updateList(data);
+                $(".action").click(function () {
+                    console.log("Row ID: " + $(this).attr("rowid") + " Status : " + $(this).attr("status"))
+                });
+                $("#flush").click(function () {
+                    console.log("flush clicked")
+                });
+                $("#scan").click(function () {
+                    console.log("scan clicked")
+                });
+                $("#resumeall").click(function () {
+                    console.log("resumeall clicked")
+                });
+            });
+        }($))
+    </script>
+</head>
+
+<body>
+    <div role="page" class="ui-content">
+        <div data-role="header" class="ui-body-a">
+            <h1>Net Cut</h1>
+        </div>
+        <div data-role="controlgroup" data-type="vertical">
+            <a id="flush" href="#" data-role="button">Flush</a>
+            <a id="scan" href="#" data-role="button">Scan</a>
+            <a id="resumeall" href="#" data-role="button">Resume All</a>
+        </div>
+        <div role="main" class="ui-content">
+            <h3>Disabled</h3>
+            <ol id="disabled" data-role="listview" class="ui-listview"></ol>
+            <h3>Enabled</h3>
+            <ol id="enabled" data-role="listview" class="ui-listview"></ol>
+        </div>
+</body>
+
+</html>

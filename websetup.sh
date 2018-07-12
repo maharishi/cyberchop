@@ -2,7 +2,7 @@
 
 sudo apt update
 
-sudo apt install lighttpd python
+sudo apt install lighttpd python libsqlite3-dev
 
 if [ ! -e /etc/lighttpd/conf-enabled/10-cgi.conf ]; then
     sudo lighttpd-enable-mod cgi
