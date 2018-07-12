@@ -488,7 +488,7 @@ function enable_protection(){
 	local machine_data
     machine_data=$(select_machine true "${gw-}" )
     local a
-    read -a a <<< "$machine_data"
+    a=(${machine_data//|/ })
     run_as_root arptables -F
 	run_as_root arptables -P INPUT DROP
     run_as_root arptables -P OUTPUT DROP
