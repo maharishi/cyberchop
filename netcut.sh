@@ -269,7 +269,7 @@ function main() {
 		arpscan
 	elif $cut_off; then
 		enable_protection
-		# netcutvictim "${gw-}" "${victim-}"
+		netcutvictim "${gw-}" "${victim-}"
 	elif $resume_single; then
 		netresume_single_host "${victim-}"
 	elif $resume_all; then
