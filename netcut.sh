@@ -80,13 +80,13 @@ function script_trap_exit() {
 # OUTS: None
 function script_exit() {
     if [[ $# -eq 1 ]]; then
-		verbose_print "$1" ${fg_red-}
+		verbose_print "$1" "${fg_red-}"
         # printf '%s\n' "$1"
         exit 0
     fi
 
     if [[ ${2-} =~ ^[0-9]+$ ]]; then
-		verbose_print "$1" ${fg_red-}
+		verbose_print "$1" "${fg_red-}"
         # printf '%b\n' "$1"
         # If we've been provided a non-zero exit code run the error trap
         if [[ $2 -ne 0 ]]; then
@@ -564,7 +564,7 @@ function arpscan(){
 	do
 		if [[ $line =~ ^([0-9]{1,3}.?){4}.+$ ]]; then
 			local a
-            read -a a <<< "$line"
+            read -r -a a <<< "$line"
 			insert_into_machine_list "${a[0]}" "${a[1]}"
 			verbose_print "inserting machine ${a[0]} with mac ${a[1]}"
 		fi
