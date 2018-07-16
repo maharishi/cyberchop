@@ -14,9 +14,12 @@ sudo service lighttpd restart
 sudo ln -s "$(pwd)"/netcut.sh ./html/cgi-bin/netcut.sh
 sudo ln -s "$(pwd)"/html /var/www/html/netcut
 
-sudo chgrp -R www-data:"$(whoami)" "$(pwd)"/html
-sudo chgrp -R www-data:"$(whoami)" /var/log/lighttpd
+sudo chgrp -R www-data "$(pwd)"/html
+sudo chgrp -R www-data /var/log/lighttpd
 sudo chmod -R 750 "$(pwd)"/html
+
+sudo cp /etc/sudoers /etc/sudoers.bak
+echo "www-data ALL=NOPASSWD: /var/www/html/netcut/cgi-bin/netcut.sh" | sudo tee -a /etc/sudoers > /dev/null
 
 read -r -d '' conf << EOM
 server.modules = (
