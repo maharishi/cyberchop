@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html class="ui-mobile" lang="en">
 
 <head>
     <meta charset="utf-8">
@@ -97,21 +97,23 @@
     </script>
 </head>
 
-<body>
-    <div role="page" class="ui-content">
-        <div data-role="header" class="ui-body-a">
-            <h1>Net Cut</h1>
+<body class="ui-mobile-viewport">
+    <div data-role="page" tabindex="0" data-theme="a">
+        <div data-role="header" data-theme="b" role="banner">
+            <h1 role="heading">Net Cut</h1>
         </div>
-        <div data-role="controlgroup" data-type="vertical">
-            <a id="flush" href="#" data-role="button">Flush</a>
-            <a id="scan" href="#" data-role="button">Scan</a>
-            <a id="resumeall" href="#" data-role="button">Resume All</a>
-        </div>
-        <div role="main" class="ui-content">
-            <h3>Disabled</h3>
-            <ol id="disabled" data-role="listview" class="ui-listview"></ol>
-            <h3>Enabled</h3>
-            <ol id="enabled" data-role="listview" class="ui-listview"></ol>
+        <div data-role="content" role="main">
+            <div data-role="content-primary" data-type="vertical">
+                <a id="flush" href="#" data-theme="b" data-role="button">Flush</a>
+                <a id="scan" href="#" data-theme="b" data-role="button">Scan</a>
+                <a id="resumeall" href="#" data-theme="b" data-role="button">Resume All</a>
+            </div>
+            <div data-role="content-secondary">
+                <h3>Disabled</h3>
+                <ol id="disabled" data-role="listview"></ol>
+                <h3>Enabled</h3>
+                <ol id="enabled" data-role="listview"></ol>
+            </div>
         </div>
 </body>
 

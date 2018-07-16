@@ -43,6 +43,8 @@ def default(form, log=""):
         disableditems.append({'name':row['ip_address'], "rowid": row['rowid']})
     for row in c.execute('SELECT rowid, ip_address FROM machine_list where active = 1'):
         enableditems.append({'name':row['ip_address'], "rowid": row['rowid']})
+    c.close()
+    conn.close()
     response={ "disableditems": disableditems, "enableditems": enableditems, "error":log}
     print(json.JSONEncoder().encode(response))
 
@@ -59,14 +61,15 @@ def main():
     form = cgi.FieldStorage()
     func = switcher.get(form.getfirst("action","default"), default)
     func(form)
-    
-try:  
-  print("Content-Type: application/json\n\n")
-  # The following makes errors go to HTTP client's browser
-  # instead of the server logs.
-  sys.stderr = sys.stdout
-  main()  
-except Exception, e:
-  print 'Content-Type: application/json'
-  response=[{'error':str(e),'trace': traceback.print_exc()}]
-  print(json.JSONEncoder().encode(response))
+
+if __name__ == "__main__":
+    try:  
+        print("Content-Type: application/json\n\n")
+        # The following makes errors go to HTTP client's browser
+        # instead of the server logs.
+        sys.stderr = sys.stdout
+        main()  
+    except Exception, e:
+        print 'Content-Type: application/json'
+        response=[{'error':str(e),'trace': traceback.print_exc()}]
+        print(json.JSONEncoder().encode(response))
