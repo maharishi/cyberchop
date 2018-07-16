@@ -264,7 +264,6 @@ function main() {
 	if $flush; then
 		netresumeall
 		refresh
-		arpscan
 	elif $scanonly; then
 		arpscan
 	elif $cut_off; then

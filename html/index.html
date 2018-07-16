@@ -32,70 +32,66 @@
     </style>
     <script>
         (function ($) {
-            var enabledlist, disabledlist;
-            enabledlist = disabledlist = "";
-            var data = {
-                "disableditems": [{
-                        name: "Item A",
-                        rowid: "1"
-                    },
-                    {
-                        name: "Item B",
-                        rowid: "2"
-                    },
-                    {
-                        name: "Item C",
-                        rowid: "3"
-                    },
-                    {
-                        name: "Item C",
-                        rowid: "3"
-                    },
-                    {
-                        name: "Item C",
-                        rowid: "3"
-                    },
-                    {
-                        name: "Item C",
-                        rowid: "3"
-                    },
-                ],
-                "enableditems": [{
-                    name: "Item D",
-                    rowid: "4"
-                }, ]
-            }
-
             var _updateList = function (data) {
+                var enabledlist, disabledlist;
+                enabledlist = disabledlist = "";
                 $.each(data.enableditems, function (i, item) {
-                    enabledlist += '<li><a class="action" href="#" status="enabled" rowid="' + item.rowid + '">' + item.name +
-                        '</a></li>';
+                    enabledlist += '<li><a class="action" href="#" action="disable" rowid="' +
+                        item.rowid + '">' +
+                        item.name + '</a></li>';
                 });
                 $.each(data.disableditems, function (i, item) {
-                    disabledlist += '<li><a class="action" href="#" status="disabled" rowid="' + item.rowid + '">' + item.name +
-                        '</a></li>';
+                    disabledlist += '<li><a class="action" href="#" action="enable" rowid="' +
+                        item.rowid + '">' +
+                        item.name + '</a></li>';
                 });
 
                 $_enabledlistview.empty().append(enabledlist).listview("refresh");
                 $_disabledlistview.empty().append(disabledlist).listview("refresh");
+                $(".action").on("click", function () {
+                    controller($(this).attr("action"), $(this).attr("rowid"));
+                });
             };
+
+            var controller = function (action, rowid) {
+                console.log("Row ID: " + rowid + " Action : " + action);
+                var urlString = "cgi-bin/netcutcontroller.py"
+                if (action != null) {
+                    urlString += "?action=" + action;
+                }
+                if (rowid != null) {
+                    urlString += "rowid=" + rowid;
+                }
+                $.ajax({
+                    url: urlString,
+                    success: function (result) {
+                        console.log(result);
+                        _updateList(result);
+                    },
+                    error: function (xhr, status, error) {
+                        console.log(xhr.responseText);
+                        console.log(error);
+                    }
+                });
+            }
 
             $(document).bind("pageshow", function () {
                 $_enabledlistview = $("#enabled");
                 $_disabledlistview = $("#disabled");
-                _updateList(data);
-                $(".action").click(function () {
-                    console.log("Row ID: " + $(this).attr("rowid") + " Status : " + $(this).attr("status"))
-                });
+
                 $("#flush").click(function () {
+                    controller("flush");
                     console.log("flush clicked")
                 });
                 $("#scan").click(function () {
+                    controller("scan");
                     console.log("scan clicked")
                 });
                 $("#resumeall").click(function () {
+                    controller("resumeall");
                     console.log("resumeall clicked")
                 });
+                controller();
             });
         }($))
     </script>
