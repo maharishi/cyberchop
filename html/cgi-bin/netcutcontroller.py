@@ -24,14 +24,14 @@ def enable(form):
     p=subprocess.Popen(['sudo','/var/www/html/netcut/cgi-bin/netcut.sh','-c', rowid], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err =  p.communicate()
     default(form, err)
-    print "enabled"
+    # print "enabled"
 
 def disable(form):
     rowid=form.getfirst("rowid", 0)
     p=subprocess.Popen(['sudo','/var/www/html/netcut/cgi-bin/netcut.sh','-r', rowid], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err =  p.communicate()
     default(form, err)
-    print "disabled"
+    # print "disabled"
 
 def default(form, log=""):
     conn = sqlite3.connect('status.db')
