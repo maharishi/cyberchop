@@ -7,7 +7,6 @@ THIS=$(readlink -f "${BASH_SOURCE[0]}" 2>/dev/null || echo "$0")
 DIR=$(dirname "${THIS}")
 
 # 'Dot' means 'source', i.e. 'include'
-# shellcheck source=/dev/null
 . "$DIR/base_script.sh"
 
 # DESC: Usage help
@@ -146,11 +145,11 @@ function netresume_single_host() {
 	# shellcheck disable=SC2001
 	a=($(echo "$machine_data" | sed 's/|/\n/g'))
 
-	verbose_print "run_as_root kill -n 9 ${a[2]}" "$fg_green"
-	verbose_print "run_as_root kill -n 9 ${a[3]}" "$fg_green"
+	verbose_print "run_as_root kill -9 $(pstree ${a[2]} -p -a -l | cut -d, -f2 | cut -d' ' -f1)" "$fg_green"
+	verbose_print "run_as_root kill -9 $(pstree ${a[3]} -p -a -l | cut -d, -f2 | cut -d' ' -f1)" "$fg_green"
 
-	run_as_root kill -n 9 "${a[2]}" #arpspoof_pid
-	run_as_root kill -n 9 "${a[3]}" #tcpkill_pid
+	run_as_root kill -9 $(pstree "${a[2]}" -p -a -l | cut -d, -f2 | cut -d' ' -f1) #arpspoof_pid
+	run_as_root kill -9 $(pstree "${a[3]}" -p -a -l | cut -d, -f2 | cut -d' ' -f1) #tcpkill_pid
 	update_pid_machine_list null null "$victim" 0
 }
 
@@ -167,6 +166,7 @@ function change_mac() {
 	# shellcheck disable=SC2034,SC2004
 	end=$(for i in {1..12}; do echo -n ${hexchars:$(($RANDOM % 16)):1}; done | sed -e 's/\(..\)/-\1/g')
 	end=${end#*-}
+
 	verbose_print "New MAC will be $end" "${fg_yellow-}"
 	ifconfig "${iface-}" down hw ether "$end"
 	ifconfig "${iface-}" up
@@ -268,18 +268,15 @@ function main() {
 	#change_mac
 	default_gw
 	if $flush; then
-		netresumeall
-		refresh
+		netresumeall || refresh
 	elif $scanonly; then
 		arpscan
 	elif $cut_off; then
-		enable_protection
-		netcutvictim "${gw-}" "${victim-}"
+		enable_protection || netcutvictim "${gw-}" "${victim-}"
 	elif $resume_single; then
 		netresume_single_host "${victim-}"
 	elif $resume_all; then
-		netresumeall
-		disable_protection
+		netresumeall || disable_protection
 	fi
 	select_machine false
 }
