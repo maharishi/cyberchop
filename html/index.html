@@ -37,17 +37,19 @@
                     $.mobile.loading(showOrHide);
                 }, delay);
             };
-            
+
             var _updateList = function (data) {
                 var enabledlist, disabledlist;
                 enabledlist = disabledlist = "";
                 $.each(data.enableditems, function (i, item) {
-                    enabledlist += '<li><a class="action" href="#" action="disable" rowid="' +
+                    enabledlist +=
+                        '<li data-icon="delete"><a class="action" href="#" action="disable" rowid="' +
                         item.rowid + '">' +
                         item.name + '</a></li>';
                 });
                 $.each(data.disableditems, function (i, item) {
-                    disabledlist += '<li><a class="action" href="#" action="enable" rowid="' +
+                    disabledlist +=
+                        '<li data-icon="lock"><a class="action" href="#" action="enable" rowid="' +
                         item.rowid + '">' +
                         item.name + '</a></li>';
                 });
@@ -70,8 +72,12 @@
                 }
                 $.ajax({
                     url: urlString,
-                    beforeSend: function() {loading("show", 1)},
-                    complete: function() {loading("hide", 1000)},
+                    beforeSend: function () {
+                        loading("show", 1)
+                    },
+                    complete: function () {
+                        loading("hide", 1000)
+                    },
                     success: function (result) {
                         console.log(result);
                         _updateList(result);
@@ -111,18 +117,21 @@
     <div data-role="page" tabindex="0" data-theme="a">
         <div data-role="header" data-theme="b" role="banner">
             <h1 role="heading">Net Cut</h1>
+            <a href="#" data-icon="home" data-iconpos="left" data-theme="b">&nbsp;</a>
         </div>
         <div data-role="content" role="main">
             <div data-role="content-primary" data-type="vertical">
-                <a id="flush" href="#" data-theme="b" data-role="button">Flush</a>
-                <a id="scan" href="#" data-theme="b" data-role="button">Scan</a>
-                <a id="resumeall" href="#" data-theme="b" data-role="button">Resume All</a>
+                <a id="flush" href="#" data-theme="b" data-role="button" data-icon="refresh">Flush</a>
+                <a id="scan" href="#" data-theme="b" data-role="button" data-icon="search">Scan</a>
+                <a id="resumeall" href="#" data-theme="b" data-role="button" data-icon="recycle">Resume All</a>
             </div>
-            <div data-role="content-secondary">
+            <div data-role="collapsible" data-collapsed="false" data-collapsed-icon="carat-d" data-expanded-icon="carat-u">
                 <h3>Disabled</h3>
-                <ol id="disabled" data-role="listview"></ol>
+                <ol id="disabled" data-role="listview" data-inset=false></ol>
+            </div>
+            <div data-role="collapsible" data-collapsed="false" data-collapsed-icon="carat-d" data-expanded-icon="carat-u">
                 <h3>Enabled</h3>
-                <ol id="enabled" data-role="listview"></ol>
+                <ol id="enabled" data-role="listview" data-inset=false></ol>
             </div>
         </div>
 </body>
