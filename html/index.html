@@ -32,6 +32,12 @@
     </style>
     <script>
         (function ($) {
+            var loading = function (showOrHide, delay) {
+                setTimeout(function () {
+                    $.mobile.loading(showOrHide);
+                }, delay);
+            };
+            
             var _updateList = function (data) {
                 var enabledlist, disabledlist;
                 enabledlist = disabledlist = "";
@@ -64,6 +70,8 @@
                 }
                 $.ajax({
                     url: urlString,
+                    beforeSend: function() {loading("show", 1)},
+                    complete: function() {loading("hide", 1000)},
                     success: function (result) {
                         console.log(result);
                         _updateList(result);
@@ -76,6 +84,7 @@
             }
 
             $(document).bind("pageshow", function () {
+                loading("show", 1)
                 $_enabledlistview = $("#enabled");
                 $_disabledlistview = $("#disabled");
 
@@ -92,6 +101,7 @@
                     console.log("resumeall clicked")
                 });
                 controller();
+                loading("hide", 1000)
             });
         }($))
     </script>

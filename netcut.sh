@@ -199,8 +199,7 @@ function arpscan() {
 			insert_into_machine_list "${a[0]}" "${a[1]}"
 			verbose_print "inserting machine ${a[0]} with mac ${a[1]}"
 		fi
-		#done < testscan.txt
-	done < <(run_as_root arp-scan -l)
+	done < <(run_as_root arp-scan -l || cat testscan.txt)
 }
 
 function insert_into_machine_list() {
