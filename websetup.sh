@@ -5,7 +5,7 @@ sudo apt update
 sudo apt install lighttpd python libsqlite3-dev
 
 if [ ! -e /etc/lighttpd/conf-enabled/10-cgi.conf ]; then
-    sudo lighttpd-enable-mod cgi
+	sudo lighttpd-enable-mod cgi
 fi
 
 sudo service lighttpd force-reload
@@ -42,7 +42,7 @@ server.port                 = 80
 
 index-file.names            = ( "index.php", "index.html", "index.lighttpd.html" )
 url.access-deny             = ( "~", ".inc" )
-static-file.exclude-extensions = ( ".php", ".pl", ".fcgi", ".py" )
+static-file.exclude-extensions = ( ".php", ".pl", ".fcgi", ".py" , ".pyc" )
 
 compress.cache-dir          = "/var/cache/lighttpd/compress/"
 compress.filetype           = ( "application/javascript", "text/css", "text/html", "text/plain" )
@@ -63,6 +63,7 @@ server.modules += ( "mod_cgi" )
 \$HTTP["url"] =~ "/cgi-bin/" {
         cgi.assign = (
                 ".py"  => "/usr/bin/python",
+                ".pyc"  => "/usr/bin/python",
         )
 }
 
@@ -77,3 +78,5 @@ echo "$cgiconf" | sudo tee /etc/lighttpd/conf-available/10-cgi.conf
 
 sudo service lighttpd force-reload
 sudo service lighttpd restart
+
+python -m py_compile html/cgi-bin/*.py
