@@ -269,17 +269,17 @@ function main() {
 	#change_mac
 	default_gw
 	if $flush; then
-		netresumeall
+		netresumeall || true
 		refresh
 	elif $scanonly; then
 		arpscan
 	elif $cut_off; then
-		enable_protection
+		enable_protection || true
 		netcutvictim "${gw-}" "${victim-}"
 	elif $resume_single; then
 		netresume_single_host "${victim-}"
 	elif $resume_all; then
-		netresumeall
+		netresumeall || true
 		disable_protection
 	fi
 	select_machine false

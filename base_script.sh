@@ -4,7 +4,7 @@
 set -o errexit  # Exit on most errors (see the manual)
 set -o errtrace # Make sure any error trap is inherited
 set -o nounset  # Disallow expansion of unset variables
-set -o pipefail # Use last non-zero exit code in a pipeline
+#set -o pipefail # Use last non-zero exit code in a pipeline
 
 # DESC: Handler for unexpected errors
 # ARGS: $1 (optional): Exit code (defaults to 1)
