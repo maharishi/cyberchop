@@ -146,11 +146,11 @@ function netresume_single_host() {
 	# shellcheck disable=SC2001
 	a=($(echo "$machine_data" | sed 's/|/\n/g'))
 
-	verbose_print "run_as_root kill -9 $(pstree "${a[2]}" -p -a -l | cut -d, -f2 | cut -d' ' -f1)" "$fg_green"
-	verbose_print "run_as_root kill -9 $(pstree "${a[3]}" -p -a -l | cut -d, -f2 | cut -d' ' -f1)" "$fg_green"
+	verbose_print "run_as_root kill -9 $(pstree "${a[2]}" -p -a -l | cut -d, -f2 | cut -d' ' -f1 | xargs)" "$fg_green"
+	verbose_print "run_as_root kill -9 $(pstree "${a[3]}" -p -a -l | cut -d, -f2 | cut -d' ' -f1 | xargs)" "$fg_green"
 
-	run_as_root kill -9 "$(pstree "${a[2]}" -p -a -l | cut -d, -f2 | cut -d' ' -f1)" #arpspoof_pid
-	run_as_root kill -9 "$(pstree "${a[3]}" -p -a -l | cut -d, -f2 | cut -d' ' -f1)" #tcpkill_pid
+	run_as_root kill -9 "$(pstree "${a[2]}" -p -a -l | cut -d, -f2 | cut -d' ' -f1 | xargs)" #arpspoof_pid
+	run_as_root kill -9 "$(pstree "${a[3]}" -p -a -l | cut -d, -f2 | cut -d' ' -f1 | xargs)" #tcpkill_pid
 	update_pid_machine_list null null "$victim" 0
 }
 
