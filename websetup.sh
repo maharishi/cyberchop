@@ -8,18 +8,22 @@ if [ ! -e /etc/lighttpd/conf-enabled/10-cgi.conf ]; then
 	sudo lighttpd-enable-mod cgi
 fi
 
+if [ ! -e /etc/lighttpd/conf-enabled/10-accesslog.conf ]; then
+	sudo lighttpd-enable-mod accesslog
+fi
+
 sudo service lighttpd force-reload
 sudo service lighttpd restart
 
-sudo ln -s "$(pwd)"/netcut.sh ./html/cgi-bin/netcut.sh
-sudo ln -s "$(pwd)"/html /var/www/html/netcut
+sudo ln -s "$(pwd)"/bin/cyberchop.sh ./html/cgi-bin/cyberchop.sh
+sudo ln -s "$(pwd)"/html /var/www/html/cyberchop
 
 sudo chgrp -R www-data "$(pwd)"/html
 sudo chgrp -R www-data /var/log/lighttpd
 sudo chmod -R 750 "$(pwd)"/html
 
 sudo cp /etc/sudoers /etc/sudoers.bak
-echo "www-data ALL=NOPASSWD: /var/www/html/netcut/cgi-bin/netcut.sh" | sudo tee -a /etc/sudoers > /dev/null
+echo "www-data ALL=NOPASSWD: /var/www/html/cyberchop/cgi-bin/cyberchop.sh" | sudo tee -a /etc/sudoers > /dev/null
 
 read -r -d '' conf << EOM
 server.modules = (
@@ -27,7 +31,6 @@ server.modules = (
         "mod_alias",
         "mod_compress",
         "mod_redirect",
-        "mod_cgi",
         "mod_rewrite",
 )
 

@@ -6,6 +6,6 @@ sudo apt install arptables dsniff arp-scan sqlite3
 
 sudo arptables -F
 
-sqlite3 status.db -init dbschema.sql ".quit"
+sqlite3 bin/status.db -init dbschema.sql ".quit"
 
-ln -s "$(pwd)"/status.db ./html/cgi-bin/status.db
+ln -s "$(pwd)"/bin/status.db ./html/cgi-bin/status.db
