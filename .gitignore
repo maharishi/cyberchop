@@ -1,4 +1,5 @@
-.vscode/launch.json
+.vscode/*
 **/*.db
 testscan.txt
-html/cgi-bin/netcut.sh
+html/cgi-bin/*.pyc
+html/cgi-bin/*.sh

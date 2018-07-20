@@ -2,33 +2,33 @@
 
 import traceback, sys, os, cgi, subprocess, sqlite3, json
 def flush(form):
-    p=subprocess.Popen(['sudo','/var/www/html/netcut/cgi-bin/netcut.sh','-f'], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    p=subprocess.Popen(['sudo','/var/www/html/cyberchop/cgi-bin/cyberchop.sh','-f'], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err =  p.communicate()
     default(form, err)
     # print "flushed"
 
 def scan(form):
-    p=subprocess.Popen(['sudo', '/var/www/html/netcut/cgi-bin/netcut.sh','-s'], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    p=subprocess.Popen(['sudo', '/var/www/html/cyberchop/cgi-bin/cyberchop.sh','-s'], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err =  p.communicate()
     default(form, err)
     # print "scanned"
 
 def resumeall(form):
-    p=subprocess.Popen(['sudo','/var/www/html/netcut/cgi-bin/netcut.sh','-a'], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    p=subprocess.Popen(['sudo','/var/www/html/cyberchop/cgi-bin/cyberchop.sh','-a'], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err =  p.communicate()
     default(form, err)
     # print "resumedall"
 
 def enable(form):
     rowid=form.getfirst("rowid", 0)
-    p=subprocess.Popen(['sudo','/var/www/html/netcut/cgi-bin/netcut.sh','-c', rowid], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    p=subprocess.Popen(['sudo','/var/www/html/cyberchop/cgi-bin/cyberchop.sh','-c', rowid], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err =  p.communicate()
     default(form, err)
     # print "enabled"
 
 def disable(form):
     rowid=form.getfirst("rowid", 0)
-    p=subprocess.Popen(['sudo','/var/www/html/netcut/cgi-bin/netcut.sh','-r', rowid], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    p=subprocess.Popen(['sudo','/var/www/html/cyberchop/cgi-bin/cyberchop.sh','-r', rowid], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     out, err =  p.communicate()
     default(form, err)
     # print "disabled"
