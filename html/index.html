@@ -57,13 +57,13 @@
                 $_enabledlistview.empty().append(enabledlist).listview("refresh");
                 $_disabledlistview.empty().append(disabledlist).listview("refresh");
                 $(".action").on("click", function () {
-                    controller($(this).attr("action"), $(this).attr("rowid"));
+                    maincontroller($(this).attr("action"), $(this).attr("rowid"));
                 });
             };
 
-            var controller = function (action, rowid) {
+            var maincontroller = function (action, rowid) {
                 console.log("Row ID: " + rowid + " Action : " + action);
-                var urlString = "cgi-bin/cyberchopcontroller.pyc"
+                var urlString = "cgi-bin/cyberchopcontroller.py"
                 if (action != null) {
                     urlString += "?action=" + action;
                 }
@@ -89,24 +89,110 @@
                 });
             }
 
-            $(document).bind("pageshow", function () {
+            var _updateFriendList = function (data) {
+                var friendlist = ""
+                $.each(data.friendlist, function (i, item) {
+                    friendlist +=
+                        '<li data-icon="edit"><a class="rename" action="rename" ip_address = "' + 
+                        item.ip_address +'" rowid="' +
+                        item.rowid + '">' +
+                        (item.friendly_name || item.ip_address) + '</a></li>';
+                });
+
+                $_freindlylistview.empty().append(friendlist).listview("refresh");
+                $(".rename").on("click", function () {
+                    console.log("rename");
+                    $("#friendly_name").attr("rowid", $(this).attr("rowid"))
+                    $("#friendly_name").attr("placeholder", $(this).attr("ip_address"))
+                    $.mobile.changePage("#popupFriendlyName");
+                });
+                $(".fnaction").on("click", function () {
+                    friendlycontroller("friendly", $("#friendly_name").attr("rowid"), $("#friendly_name").val())
+                    $.mobile.changePage("#freindly");
+                });
+                $(".fncancel").on("click", function () {
+                    $.mobile.changePage("#freindly");
+                });
+            };
+
+            var friendlycontroller = function (action, rowid, friendname) {
+                console.log("Row ID: " + rowid + " Action : " + action + " Friend Name : " + friendname);
+                var urlString = "cgi-bin/cyberchopcontroller.py"
+                if (action != null) {
+                    urlString += "?action=" + action;
+                }
+                if (rowid != null) {
+                    urlString += "&rowid=" + rowid;
+                }
+                if (friendname != null) {
+                    urlString += "&name=" + friendname;
+                }
+                $.ajax({
+                    url: urlString,
+                    beforeSend: function () {
+                        loading("show", 1)
+                    },
+                    complete: function () {
+                        loading("hide", 1000)
+                    },
+                    success: function (result) {
+                        console.log(result);
+                        _updateFriendList(result);
+                    },
+                    error: function (xhr, status, error) {
+                        console.log(xhr.responseText);
+                        console.log(error);
+                    }
+                });
+            }
+
+            $(function () {    
+                $("[data-role='navbar']").navbar();    
+                $("[data-role='header']").toolbar();
+            });
+            // Update the contents of the toolbars
+            $(document).on("pagecontainerchange", function () {    
+                // Each of the four pages in this demo has a data-title attribute
+                // which value is equal to the text of the nav button
+                // For example, on first page: <div data-role="page" data-title="Info">
+                var current = $(".ui-page-active").jqmData("title");     // Change the heading
+                    
+                $("[data-role='header'] h1").text(current);     // Remove active class from nav buttons
+                    
+                $("[data-role='navbar'] a.ui-btn-active").removeClass("ui-btn-active");     // Add active class to current nav button
+                    
+                $("[data-role='navbar'] a").each(function () {        
+                    if ($(this).text() === current) {            
+                        $(this).addClass("ui-btn-active");        
+                    }    
+                });
+            });
+
+            $(document).on("pageshow", "#main", function () {
                 loading("show", 1)
                 $_enabledlistview = $("#enabled");
                 $_disabledlistview = $("#disabled");
 
                 $("#flush").click(function () {
-                    controller("flush");
+                    maincontroller("flush");
                     console.log("flush clicked")
                 });
                 $("#scan").click(function () {
-                    controller("scan");
+                    maincontroller("scan");
                     console.log("scan clicked")
                 });
                 $("#resumeall").click(function () {
-                    controller("resumeall");
+                    maincontroller("resumeall");
                     console.log("resumeall clicked")
                 });
-                controller();
+                maincontroller();
+                loading("hide", 1000)
+            });
+
+            $(document).on("pageshow", "#freindly", function () {
+                loading("show", 1)
+                $_freindlylistview = $("#freindlynames");
+                friendlycontroller("friendly");
                 loading("hide", 1000)
             });
         }($))
@@ -114,11 +200,23 @@
 </head>
 
 <body class="ui-mobile-viewport">
-    <div data-role="page" tabindex="0" data-theme="a">
-        <div data-role="header" data-theme="b" role="banner">
-            <h1 role="heading">Net Cut</h1>
-            <a href="#" data-icon="home" data-iconpos="left" data-theme="b">&nbsp;</a>
+    <div data-role="header" data-theme="b" role="banner">
+        <h1 role="heading">Net Cut</h1>
+        <div data-role="navbar" role="navigation">
+            <ul>
+                <li>
+                    <a href="#main" data-rel="close">Cyberchop</a>
+                </li>
+                <li>
+                    <a href="#freindly" data-rel="close">Friendly Name</a>
+                </li>
+                <li>
+                    <a href="#schedule" data-rel="close">Schedule</a>
+                </li>
+            </ul>
         </div>
+    </div>
+    <div data-role="page" id="main" tabindex="0" data-theme="a" data-title="Cyberchop">
         <div data-role="content" role="main">
             <div data-role="content-primary" data-type="vertical">
                 <a id="flush" href="#" data-theme="b" data-role="button" data-icon="refresh">Flush</a>
@@ -134,6 +232,29 @@
                 <ol id="enabled" data-role="listview" data-inset=false></ol>
             </div>
         </div>
+    </div>
+    <div data-role="page" id="freindly" tabindex="0" data-theme="a" data-title="Friendly Name">
+        <div data-role="content" role="main">
+            <div data-role="collapsible" data-collapsed="false" data-collapsed-icon="carat-d" data-expanded-icon="carat-u">
+                <h3>Friendly Name</h3>
+                <ol id="freindlynames" data-role="listview" data-inset=false></ol>
+            </div>
+        </div>
+    </div>
+    <div data-role="page" id="schedule" tabindex="0" data-theme="a" data-title="Schedule">
+        <div data-role="content" role="main">
+            Functionality coming soon
+        </div>
+    </div>
+    <div data-role="dialog" id="popupFriendlyName" style="position: relative; top:10%">
+        <div style="padding:10px 20px;">
+            <h3>Please provide friendly name</h3>
+            <label for="friendly_name" class="ui-hidden-accessible">Friendly Name:</label>
+            <input type="text" name="friendly_name" id="friendly_name" value="" placeholder="Friendly Name" data-theme="a" rowid="">
+            <button type="button" class="fnaction ui-btn ui-corner-all ui-shadow ui-btn-b ui-btn-icon-left ui-icon-check">Change</button>
+            <button type="button" class="fncancel ui-btn ui-corner-all ui-shadow ui-btn-b ui-btn-icon-left ui-icon-back">Cancel</button>
+        </div>
+    </div>
 </body>
 
 </html>

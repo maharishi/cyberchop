@@ -10,4 +10,10 @@ create table machine_list
 	tcpkill_pid int,
 	active boolean
 );
+drop table if exists machine_details;
+CREATE TABLE machine_details
+(
+	mac_address varchar(20),
+	friendly_name varchar(50)
+);
 commit;
