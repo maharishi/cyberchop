@@ -77,13 +77,19 @@ def friendly(form):
     print(json.JSONEncoder().encode(response))
 
 def default(form, log=""):
+    selectsql = '''
+            SELECT ml.rowid, ml.ip_address, md.friendly_name 
+            FROM machine_list AS ml LEFT OUTER JOIN machine_details AS md 
+                ON md.mac_address = ml.mac_address
+            WHERE ml.active = ?;
+        '''
     c = getCursor(getDatabase())
     disableditems=[]
     enableditems=[]
-    for row in c.execute('SELECT rowid, ip_address FROM machine_list where active = 0'):
-        disableditems.append({'name':row['ip_address'], "rowid": row['rowid']})
-    for row in c.execute('SELECT rowid, ip_address FROM machine_list where active = 1'):
-        enableditems.append({'name':row['ip_address'], "rowid": row['rowid']})
+    for row in c.execute(selectsql, ( '0' )):
+        disableditems.append({'name':row['ip_address'], 'friendly_name': row['friendly_name'], "rowid": row['rowid']})
+    for row in c.execute(selectsql, ( '1' )):
+        enableditems.append({'name':row['ip_address'], 'friendly_name': row['friendly_name'], "rowid": row['rowid']})
     c.close()
     response={ "disableditems": disableditems, "enableditems": enableditems, "error":log}
     print(json.JSONEncoder().encode(response))
