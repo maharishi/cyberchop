@@ -29,6 +29,36 @@
                 width: 24.925%;
             }
         }
+
+        .flow.out {
+            -webkit-transform: translateX(-100%) scale(.7);
+            -webkit-animation-name: flowouttoleft;
+            -webkit-animation-timing-function: ease;
+            -webkit-animation-duration: 950ms;
+            -moz-transform: translateX(-100%) scale(.7);
+            -moz-animation-name: flowouttoleft;
+            -moz-animation-timing-function: ease;
+            -moz-animation-duration: 350ms;
+            transform: translateX(-100%) scale(.7);
+            animation-name: flowouttoleft;
+            animation-timing-function: ease;
+            animation-duration: 950ms;
+        }
+
+        .flow.in {
+            -webkit-transform: translateX(0) scale(1);
+            -webkit-animation-name: flowinfromright;
+            -webkit-animation-timing-function: ease;
+            -webkit-animation-duration: 950ms;
+            -moz-transform: translateX(0) scale(1);
+            -moz-animation-name: flowinfromright;
+            -moz-animation-timing-function: ease;
+            -moz-animation-duration: 350ms;
+            transform: translateX(0) scale(1);
+            animation-name: flowinfromright;
+            animation-timing-function: ease;
+            animation-duration: 950ms;
+        }
     </style>
     <script>
         (function ($) {
@@ -110,8 +140,8 @@
                     $.mobile.changePage("#popupFriendlyName");
                 });
                 $(".fnaction").on("click", function () {
-                    friendlycontroller("friendly", 
-                        $("#friendly_name").attr("rowid"), 
+                    friendlycontroller("friendly",
+                        $("#friendly_name").attr("rowid"),
                         $("#friendly_name").val())
                     $.mobile.changePage("#freindly");
                 });
@@ -210,13 +240,13 @@
         <div data-role="navbar" role="navigation">
             <ul>
                 <li>
-                    <a href="#main" data-rel="close" data-transition="pop">Cyberchop</a>
+                    <a href="#main" data-rel="close" data-transition="flow">Cyberchop</a>
                 </li>
                 <li>
-                    <a href="#freindly" data-rel="close" data-transition="flip">Friendly Name</a>
+                    <a href="#freindly" data-rel="close" data-transition="flow">Friendly Name</a>
                 </li>
                 <li>
-                    <a href="#schedule" data-rel="close" data-transition="slide">Schedule</a>
+                    <a href="#schedule" data-rel="close" data-transition="flow">Schedule</a>
                 </li>
             </ul>
         </div>
@@ -251,15 +281,33 @@
             Functionality coming soon
         </div>
     </div>
+    <div data-role="page" id="info" tabindex="0" data-theme="a" data-title="Information">
+        <div data-role="content" role="main">
+            More Information
+        </div>
+    </div>
     <div data-role="dialog" id="popupFriendlyName" style="position: relative; top:10%">
         <div style="padding:10px 20px;">
             <h3>Please provide friendly name</h3>
             <label for="friendly_name" class="ui-hidden-accessible">Friendly Name:</label>
             <input type="text" name="friendly_name" id="friendly_name" value="" placeholder="Friendly Name" data-theme="a" rowid="">
             <div class="ui-grid-a ui-responsive center">
-                    <div class="ui-block-a"><button type="button" class="fnaction ui-btn ui-corner-all ui-shadow ui-btn-b ui-btn-icon-left ui-icon-check">Change</button></div>
-                    <div class="ui-block-b"><button type="button" class="fncancel ui-btn ui-corner-all ui-shadow ui-btn-b ui-btn-icon-left ui-icon-back">Cancel</button></div>
+                <div class="ui-block-a">
+                    <button type="button" class="fnaction ui-btn ui-corner-all ui-shadow ui-btn-b ui-btn-icon-left ui-icon-check">Change</button>
+                </div>
+                <div class="ui-block-b">
+                    <button type="button" class="fncancel ui-btn ui-corner-all ui-shadow ui-btn-b ui-btn-icon-left ui-icon-back">Cancel</button>
+                </div>
             </div>
+        </div>
+    </div>
+    <div data-role="footer" class="ui-footer ui-bar-b">
+        <div data-role="navbar" role="navigation">
+            <ul>
+                <li>
+                    <a href="#info" data-rel="close" data-transition="flow">Info</a>
+                </li>
+            </ul>
         </div>
     </div>
 </body>
