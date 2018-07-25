@@ -1,5 +1,5 @@
 # Cyberchop 
-## A Simple way to control your kids access to internet at home
+## A Simple way to control your kids access to internet at home ![Say Thanks](https://img.shields.io/badge/Say%20Thanks-!-1EAEDB.svg)
 
 #### Introduction
 Cyberchop is a webapp designed to control the usage of internet of various devices your home via a single interface using a low end cheap linux devices like [Raspberry Pi](https://www.raspberrypi.org/) or [CHIP](https://getchip.com/) to manage kids online time. It can control the internet of devices in an OS agnostic way. 
@@ -17,7 +17,7 @@ Any help in contributing to this project will be appreciated
 * Configuration best practices for lighttpd server
 * Any recommended best practices for shell scripting, python, OS Hardening
 * Setting up wikis & FAQs
-* Donations for coffee [Paypal](paypal.me/Maharishi/1)
+* Donations for [coffee](http://paypal.me/Maharishi/1)
 
 #### Installation
 
