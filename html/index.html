@@ -45,13 +45,13 @@
                     enabledlist +=
                         '<li data-icon="delete"><a class="action" href="#" action="disable" rowid="' +
                         item.rowid + '">' +
-                        item.name + '</a></li>';
+                        (item.friendly_name || item.name) + '</a></li>';
                 });
                 $.each(data.disableditems, function (i, item) {
                     disabledlist +=
                         '<li data-icon="lock"><a class="action" href="#" action="enable" rowid="' +
                         item.rowid + '">' +
-                        item.name + '</a></li>';
+                        (item.friendly_name || item.name) + '</a></li>';
                 });
 
                 $_enabledlistview.empty().append(enabledlist).listview("refresh");
@@ -110,7 +110,9 @@
                     $.mobile.changePage("#popupFriendlyName");
                 });
                 $(".fnaction").on("click", function () {
-                    friendlycontroller("friendly", $("#friendly_name").attr("rowid"), $("#friendly_name").val())
+                    friendlycontroller("friendly", 
+                        $("#friendly_name").attr("rowid"), 
+                        $("#friendly_name").val())
                     $.mobile.changePage("#freindly");
                 });
                 $(".fncancel").on("click", function () {
@@ -208,13 +210,13 @@
         <div data-role="navbar" role="navigation">
             <ul>
                 <li>
-                    <a href="#main" data-rel="close">Cyberchop</a>
+                    <a href="#main" data-rel="close" data-transition="pop">Cyberchop</a>
                 </li>
                 <li>
-                    <a href="#freindly" data-rel="close">Friendly Name</a>
+                    <a href="#freindly" data-rel="close" data-transition="flip">Friendly Name</a>
                 </li>
                 <li>
-                    <a href="#schedule" data-rel="close">Schedule</a>
+                    <a href="#schedule" data-rel="close" data-transition="slide">Schedule</a>
                 </li>
             </ul>
         </div>
@@ -254,8 +256,10 @@
             <h3>Please provide friendly name</h3>
             <label for="friendly_name" class="ui-hidden-accessible">Friendly Name:</label>
             <input type="text" name="friendly_name" id="friendly_name" value="" placeholder="Friendly Name" data-theme="a" rowid="">
-            <button type="button" class="fnaction ui-btn ui-corner-all ui-shadow ui-btn-b ui-btn-icon-left ui-icon-check">Change</button>
-            <button type="button" class="fncancel ui-btn ui-corner-all ui-shadow ui-btn-b ui-btn-icon-left ui-icon-back">Cancel</button>
+            <div class="ui-grid-a ui-responsive center">
+                    <div class="ui-block-a"><button type="button" class="fnaction ui-btn ui-corner-all ui-shadow ui-btn-b ui-btn-icon-left ui-icon-check">Change</button></div>
+                    <div class="ui-block-b"><button type="button" class="fncancel ui-btn ui-corner-all ui-shadow ui-btn-b ui-btn-icon-left ui-icon-back">Cancel</button></div>
+            </div>
         </div>
     </div>
 </body>
